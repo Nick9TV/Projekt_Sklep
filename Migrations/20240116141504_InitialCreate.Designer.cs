@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Projekt_Sklep.Models;
+using Projekt_Sklep.Data;
 
 #nullable disable
 
 namespace Projekt_Sklep.Migrations
 {
     [DbContext(typeof(ShopContext))]
-    [Migration("20240114200033_InitialCreate")]
+    [Migration("20240116141504_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
