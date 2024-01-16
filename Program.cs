@@ -1,6 +1,7 @@
 global using Projekt_Sklep.Models;
 global using Projekt_Sklep.Data;
 using Projekt_Sklep.Services.CarService;
+using Projekt_Sklep.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddDbContext<ShopContext>();
 
 var app = builder.Build();

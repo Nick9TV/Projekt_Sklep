@@ -12,7 +12,7 @@ using Projekt_Sklep.Data;
 namespace Projekt_Sklep.Migrations
 {
     [DbContext(typeof(ShopContext))]
-    [Migration("20240116141504_InitialCreate")]
+    [Migration("20240116194321_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -122,9 +122,8 @@ namespace Projekt_Sklep.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Phone")
+                        .HasColumnType("int");
 
                     b.Property<string>("Surname")
                         .IsRequired()
