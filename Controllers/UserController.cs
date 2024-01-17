@@ -15,7 +15,7 @@ namespace Projekt_Sklep.Controllers
         {
             _context = context;
         }
-        [HttpPost("register")]
+        [HttpPost("Register")]
         public async Task<IActionResult> Register(UserRegisterRequest request)
         {
             
@@ -38,10 +38,23 @@ namespace Projekt_Sklep.Controllers
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            
+
+            //await SendVerificationEmail(user);
+
             return Ok("Rejestracja konta powiodła się");
         }
-        [HttpPost("login")]
+
+        //private async Task SendVerificationEmail(User user)
+        //{
+        //    string verifyUrl = Url.Action("VerifyEmail", "Account", new { token = user.VerificationToken }, Request.Scheme);
+        //    string emailBody = $"Proszę potwierdzić swój adres email klikając na ten link: {verifyUrl}";
+
+        //    // Logika wysyłania email
+        //    // Może wyglądać różnie w zależności od wybranej metody wysyłania emaili
+        //    await _emailService.SendEmailAsync(user.Email, "Potwierdź swój email", emailBody);
+        //}
+
+        [HttpPost("Login")]
         public async Task<IActionResult> Login(UserLoginRequest request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
