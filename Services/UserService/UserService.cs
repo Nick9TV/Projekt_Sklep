@@ -52,7 +52,6 @@ namespace Projekt_Sklep.Services.UserService
             User.Surname = request.Surname;
             User.Phone = request.Phone;
             User.Email = request.Email;
-            User.Password = request.Password;
 
             await _context.SaveChangesAsync();
 

@@ -2,6 +2,7 @@ global using Projekt_Sklep.Models;
 global using Projekt_Sklep.Data;
 using Projekt_Sklep.Services.CarService;
 using Projekt_Sklep.Services.UserService;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 

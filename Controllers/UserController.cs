@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Projekt_Sklep.Models;
-using Projekt_Sklep.Services.UserService;
+using Projekt_Sklep.Models.Requests;
+using System.Security.Cryptography;
 
 namespace Projekt_Sklep.Controllers
 {
@@ -10,48 +9,128 @@ namespace Projekt_Sklep.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly ShopContext _context;
 
-        public UserController(IUserService UserService) 
+        public UserController(ShopContext context)
         {
-            _userService = UserService;
+            _context = context;
+        }
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(UserRegisterRequest request)
+        {
+            
+            if (_context.Users.Any(u => u.Email == request.Email))
+            {
+                return BadRequest("Ten email jest już wykorzystany");
+            }
+            CreatePasswordHash(request.Password,
+                out byte[] passwordHash,
+                out byte[] passwordsalt);
+            var user = new User
+            {
+                Name = request.Name,
+                Surname = request.Surname,
+                Phone = request.Phone,
+                Email = request.Email,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordsalt,
+                VerificationToken = CreateRandomToken()
+            };
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            
+            return Ok("Rejestracja konta powiodła się");
+        }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UserLoginRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (user == null)
+            {
+                return BadRequest("Nie znaleziono takiego użytkownika.");
+            }
+            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            {
+                return BadRequest("Hasło niepoprawne.");
+            }
+            if (user.VerifiedAt == null)
+            {
+                return BadRequest("Użytkownik nie zweryfikowany.");
+            }
+            return Ok($"Witaj z powrotem, {user.Name} {user.Surname}! :)");
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<User>>> GetAllUsers()
+        private static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            return await _userService.GetAllUsers();
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac
+                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
         }
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetSingleUser(int id)
+        [HttpPost("veryfy")]
+        public async Task<IActionResult> Veryfy(string token)
         {
-            var result = await _userService.GetSingleUser(id);
-            if (result == null)
-                return NotFound("Nie ma użytkownika o takim ID");
-            return Ok(result);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
+            if (user == null)
+            {
+                return BadRequest("Błędny Token.");
+            }
+
+            user.VerifiedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok("Użytkownik zweryfikowany");
         }
-        [HttpPost]
-        public async Task<ActionResult<List<User>>> AddUser(User User)
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword(string email)
         {
-            var result = await _userService.AddUser(User);
-            return Ok(result);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                return BadRequest("Nie ma użytkownika o podanym emailu");
+            }
+
+            user.PasswordResetToken=CreateRandomToken();
+            user.ResetTokenExpires = DateTime.Now.AddMinutes(15);
+            await _context.SaveChangesAsync();
+
+            return Ok("Można zmienić hasło.");
         }
-        [HttpPut("{id}")]
-        public async Task<ActionResult<List<User>>> UpdateUser(int id, User request)
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
         {
-            var result = await _userService.UpdateUser(id, request);
-            if (result == null)
-                return NotFound("Nie ma użytkownika o takim ID");
-            return Ok(result);
-        }
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<List<User>>> DeleteUser(int id)
-        {
-            var result = await _userService.DeleteUser(id);
-            if (result == null)
-                return NotFound("Nie ma użytkownika o takim ID");
-            return Ok(result);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == request.Token);
+            if (user == null)
+            {
+                return BadRequest("Błędny Token.");
+            }
+
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.PasswordResetToken = null;
+            user.ResetTokenExpires = null;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Hasło zienione.");
         }
 
+            private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt) 
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+        private string CreateRandomToken() 
+        {
+            return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
+        }
+        
     }
 }
