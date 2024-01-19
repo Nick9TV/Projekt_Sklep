@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Projekt_Sklep.Models.Requests;
+using System.Net.Mail;
 using System.Security.Cryptography;
+using System.Net;
 
 namespace Projekt_Sklep.Controllers
 {
@@ -39,20 +41,10 @@ namespace Projekt_Sklep.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            //await SendVerificationEmail(user);
+            await SendVerificationEmail(user.Email, user.VerificationToken);
 
             return Ok("Rejestracja konta powiodła się");
         }
-
-        //private async Task SendVerificationEmail(User user)
-        //{
-        //    string verifyUrl = Url.Action("VerifyEmail", "Account", new { token = user.VerificationToken }, Request.Scheme);
-        //    string emailBody = $"Proszę potwierdzić swój adres email klikając na ten link: {verifyUrl}";
-
-        //    // Logika wysyłania email
-        //    // Może wyglądać różnie w zależności od wybranej metody wysyłania emaili
-        //    await _emailService.SendEmailAsync(user.Email, "Potwierdź swój email", emailBody);
-        //}
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserLoginRequest request)
@@ -82,7 +74,7 @@ namespace Projekt_Sklep.Controllers
                 return computedHash.SequenceEqual(passwordHash);
             }
         }
-        [HttpPost("veryfy")]
+        [HttpPost("verify")]
         public async Task<IActionResult> Veryfy(string token)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
@@ -95,6 +87,32 @@ namespace Projekt_Sklep.Controllers
             await _context.SaveChangesAsync();
 
             return Ok("Użytkownik zweryfikowany");
+        }
+        private async Task SendVerificationEmail(string userEmail, string token)
+        {
+
+            using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com"))
+            {
+                smtpClient.UseDefaultCredentials = false;
+                smtpClient.Credentials = new NetworkCredential("Tu email", "tu key");
+                smtpClient.EnableSsl = true;
+                smtpClient.Port = 587;
+
+
+                MailMessage mailMessage = new MailMessage
+                {
+                    From = new MailAddress("Tu email"),
+                    Subject = "Account Verification",
+                    Body = $"Hello,\n\nPlease click the following link to verify your account: " +
+                           $"https://localhost:7140/api/user/verify?token={token}\n\nBest regards,\nYour App"
+                };
+
+
+                mailMessage.To.Add(userEmail);
+
+
+                await smtpClient.SendMailAsync(mailMessage);
+            }
         }
         [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(string email)
@@ -111,7 +129,6 @@ namespace Projekt_Sklep.Controllers
 
             return Ok("Można zmienić hasło.");
         }
-        [HttpPost("ResetPassword")]
         public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == request.Token);
@@ -131,8 +148,30 @@ namespace Projekt_Sklep.Controllers
 
             return Ok("Hasło zienione.");
         }
+        private async Task SendPasswordResetEmail(string userEmail, string token)
+        {
+            using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com"))
+            {
+                smtpClient.UseDefaultCredentials = false;
+                smtpClient.Credentials = new NetworkCredential("TU WPISZ EMAIL", "TU WPISZ HASŁO KLUCZ");
+                smtpClient.EnableSsl = true;
+                smtpClient.Port = 587;
 
-            private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt) 
+                MailMessage mailMessage = new MailMessage
+                {
+                    From = new MailAddress("mikserkis@gmail.com"),
+                    Subject = "Password Reset",
+                    Body = $"Hello,\n\nYou have requested to reset your password. Please click the following link to reset your password: " +
+                           $"https://localhost:7140/api/user/reset-password?token={token}\n\nBest regards,\nYour App"
+                };
+
+                mailMessage.To.Add(userEmail);
+
+                await smtpClient.SendMailAsync(mailMessage);
+            }
+        }
+
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt) 
         {
             using (var hmac = new HMACSHA512())
             {
