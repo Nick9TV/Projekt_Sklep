@@ -5,7 +5,7 @@ namespace Projekt_Sklep.Models
     {
 
         public int CartId { get; set; }
-        public int UserId { get; set;}
+        public List<User> Users { get; set;}
         public List<Car> Cars { get; set; }
     }
 }

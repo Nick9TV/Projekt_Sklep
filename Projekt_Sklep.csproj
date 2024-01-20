@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Folder Include="JavaScript\" />
+    <Folder Include="FrontEnd\" />
   </ItemGroup>
 
 </Project>
