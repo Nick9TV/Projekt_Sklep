@@ -7,6 +7,7 @@
         public string Model { get; set; }
         public int Year { get; set; }
         public float Price { get; set; }
+        public int Quantity { get; set; }
 
     }
 }
