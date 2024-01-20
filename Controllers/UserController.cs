@@ -1,4 +1,4 @@
-﻿
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Projekt_Sklep.Models.Requests;
 using System.Net.Mail;
@@ -74,7 +74,7 @@ namespace Projekt_Sklep.Controllers
                 return computedHash.SequenceEqual(passwordHash);
             }
         }
-        [HttpPost("verify")]
+        [HttpGet("verify")]
         public async Task<IActionResult> Veryfy(string token)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
@@ -94,17 +94,17 @@ namespace Projekt_Sklep.Controllers
             using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com"))
             {
                 smtpClient.UseDefaultCredentials = false;
-                smtpClient.Credentials = new NetworkCredential("Tu email", "tu key");
+                smtpClient.Credentials = new NetworkCredential("mikihoffmann00@gmail.com", "skgy krow imbu ciel");
                 smtpClient.EnableSsl = true;
                 smtpClient.Port = 587;
 
 
                 MailMessage mailMessage = new MailMessage
                 {
-                    From = new MailAddress("Tu email"),
+                    From = new MailAddress("mikihoffmann00@gmail.com"),
                     Subject = "Account Verification",
-                    Body = $"Hello,\n\nPlease click the following link to verify your account: " +
-                           $"https://localhost:7140/api/user/verify?token={token}\n\nBest regards,\nYour App"
+                    Body = $"Kliknij poniższy link aby zweryfikować konto: " +
+                           $"https://localhost:7157/api/User/verify?token={token}"
                 };
 
 
@@ -129,6 +129,7 @@ namespace Projekt_Sklep.Controllers
 
             return Ok("Można zmienić hasło.");
         }
+        [HttpPost("ResetPassword")]
         public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == request.Token);
@@ -153,16 +154,16 @@ namespace Projekt_Sklep.Controllers
             using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com"))
             {
                 smtpClient.UseDefaultCredentials = false;
-                smtpClient.Credentials = new NetworkCredential("TU WPISZ EMAIL", "TU WPISZ HASŁO KLUCZ");
+                smtpClient.Credentials = new NetworkCredential("mikihoffmann00@gmail.com", "skgy krow imbu ciel");
                 smtpClient.EnableSsl = true;
                 smtpClient.Port = 587;
 
                 MailMessage mailMessage = new MailMessage
                 {
-                    From = new MailAddress("mikserkis@gmail.com"),
+                    From = new MailAddress("mikihoffmann00@gmail.com"),
                     Subject = "Password Reset",
                     Body = $"Hello,\n\nYou have requested to reset your password. Please click the following link to reset your password: " +
-                           $"https://localhost:7140/api/user/reset-password?token={token}\n\nBest regards,\nYour App"
+                           $"https://localhost:7157/api/user/reset-password?token={token}\n\nBest regards,\nYour App"
                 };
 
                 mailMessage.To.Add(userEmail);

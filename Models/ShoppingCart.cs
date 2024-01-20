@@ -1,6 +1,6 @@
 ﻿namespace Projekt_Sklep.Models
 {
-    public class Cart
+    public class ShoppingCart
     {
         public int CartId { get; set; }
         public int UserId { get; set;}

@@ -3,6 +3,7 @@ global using Projekt_Sklep.Data;
 using Projekt_Sklep.Services.CarService;
 using Projekt_Sklep.Services.UserService;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddDbContext<ShopContext>();
+
 
 var app = builder.Build();
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Projekt_Sklep.Models;
 using Projekt_Sklep.Services.UserService;
+using System.Security.Cryptography;
 
 namespace Projekt_Sklep.Controllers
 {
@@ -12,7 +13,7 @@ namespace Projekt_Sklep.Controllers
     {
         private readonly IUserService _userService;
 
-        public AdminPanelController(IUserService UserService) 
+        public AdminPanelController(IUserService UserService)
         {
             _userService = UserService;
         }
@@ -52,6 +53,6 @@ namespace Projekt_Sklep.Controllers
                 return NotFound("Nie ma użytkownika o takim ID");
             return Ok(result);
         }
-
+        
     }
 }
