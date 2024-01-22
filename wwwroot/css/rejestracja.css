@@ -1,7 +1,7 @@
 ﻿/* config.css */
 
 :root {
-    --baseColor: #0d8a1d;
+    --baseColor: #127E9E;
 }
 
 /* helpers/align.css */
@@ -49,7 +49,7 @@ body {
 }
 
 .ikona {
-    color: #0d8a1d;
+    color: #127E9E;
 }
 
 /* layout/base.css */
@@ -75,8 +75,10 @@ html {
 }
 
 body {
-    background-image: url('../Media/944236.jpg');
-    background-size: cover;
+    background-color: black;
+    position: relative;
+    margin: 0;
+    min-block-size: 100vh;
     color: var(--bodyColor);
     font-family: var(--bodyFontFamily), var(--bodyFontFamilyFallback);
     font-size: var(--bodyFontSize);
@@ -85,6 +87,23 @@ body {
     margin: 0;
     min-block-size: 100vh;
 }
+    body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: url('../Media/944236.jpg');
+        background-size: cover;
+        opacity: 0.5; /* Dostosuj tę wartość, aby kontrolować poziom przyciemnienia */
+        z-index: -1;
+    }
+
+    body > * {
+        position: relative;
+        z-index: 1;
+    }
 
 /* modules/anchor.css */
 
@@ -152,7 +171,7 @@ input {
     --loginInputBackgroundColor: #3b4148;
     --loginInputHoverBackgroundColor: #434a52;
     --loginLabelBackgroundColor: #363b41;
-    --loginSubmitBackgroundColor: #0d8a1d;
+    --loginSubmitBackgroundColor: #597088;
     --loginSubmitColor: #eee;
     --loginSubmitHoverBackgroundColor: #13af28;
 }
@@ -165,6 +184,7 @@ input {
     .login input[type="email"],
     .login input[type="text"],
     .login input[type="password"],
+    .login input[type="number"],
     .login input[type="submit"] {
         border-radius: var(--loginBorderRadus);
         padding: 1rem;
@@ -179,6 +199,7 @@ input {
 
     .login input[type="password"],
     .login input[type="email"],
+    .login input[type="number"],
     .login input[type="text"] {
         background-color: var(--loginInputBackgroundColor);
         border-bottom-left-radius: 0;
@@ -189,6 +210,8 @@ input {
         .login input[type="password"]:hover,
         .login input[type="email"]:focus,
         .login input[type="email"]:hover,
+        .login input[type="number"]:focus,
+        .login input[type="number"]:hover,
         .login input[type="text"]:focus,
         .login input[type="text"]:hover {
             background-color: var(--loginInputHoverBackgroundColor);
@@ -203,7 +226,7 @@ input {
 
         .login input[type="submit"]:focus,
         .login input[type="submit"]:hover {
-            background-color: var(--loginSubmitHoverBackgroundColor);
+            background-color: #127E9E;
         }
 
 /* modules/text.css */

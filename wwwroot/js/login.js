@@ -30,8 +30,6 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
                 return response.text().then(errorData => {
                     const errorMessage = document.createElement('div');
 
-                    document.getElementById('error_message').appendChild(errorMessage);
-
                     setTimeout(() => {
                         errorMessage.style.display = 'none';
                     }, 4000);
@@ -59,7 +57,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
                     window.location.href = 'Admin/adminindex.html';
                 }
                 if (userRole === 'User') {
-                    window.location.href = 'Sites/userindex.html';
+                    window.location.href = 'User/userindex.html';
                 }
             }, 4000);
         })

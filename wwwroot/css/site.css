@@ -59,7 +59,7 @@ header {
     }
 
         .menu a:hover {
-            color: rgb(255, 94, 0);
+            color: #597088;
         }
 
 .login-icon {
@@ -77,7 +77,7 @@ header {
     }
 
         .login-icon i:hover {
-            color: rgb(255, 94, 0);
+            color: #597088;
             transform: scale(1.1);
         }
 
@@ -183,7 +183,7 @@ main-text2 {
 
     .main-shop:hover {
         background-color: white;
-        color: black;
+        color: #597088;
     }
 
     .main-shop i {
@@ -206,7 +206,7 @@ main-text2 {
 
     .down i:hover {
         background-color: white;
-        color: black;
+        color: #597088;
         transition: all .42s ease;
     }
 
