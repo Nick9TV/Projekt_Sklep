@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Drawing;
 
 
 namespace Projekt_Sklep.Controllers
@@ -13,14 +14,15 @@ namespace Projekt_Sklep.Controllers
         {
             _context = context;
         }
+
         [HttpGet("Cart")]
         public ActionResult<Cart> GetCart()
         {
-            return Ok();
+            return Ok(_context);
         }
 
         [HttpPost("AddToCart/{CarId}")]
-        public async Task<ActionResult<Cart>> AddToCart(int CarId)
+        public async Task<ActionResult<Cart>> AddToCart(int CarId, [FromQuery] int Quantity)
         {
             var Car = _context.Cars.FirstOrDefault(car => car.CarId == CarId);
 
@@ -31,6 +33,17 @@ namespace Projekt_Sklep.Controllers
 
             // Check if the product is already in the cart
             var existingProduct = _context.Cars.FirstOrDefault(p => p.CarId == CarId);
+            if (existingProduct != null)
+            {
+
+                existingProduct.Quantity += Quantity;
+            }
+            else
+            {
+                Car.Quantity = Quantity;
+                _context.Cars.Add(Car);
+            }
+
 
             return Ok("Product has been successfully added to cart.");
         }

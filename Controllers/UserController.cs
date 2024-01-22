@@ -4,6 +4,13 @@ using Projekt_Sklep.Models.Requests;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Net;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Projekt_Sklep.Models;
+using System.Text.RegularExpressions;
 
 namespace Projekt_Sklep.Controllers
 {
@@ -12,15 +19,20 @@ namespace Projekt_Sklep.Controllers
     public class UserController : ControllerBase
     {
         private readonly ShopContext _context;
+        private readonly IConfiguration _configuration;
 
-        public UserController(ShopContext context)
+        public UserController(ShopContext context, IConfiguration configuration)
         {
+            _configuration = configuration;
             _context = context;
         }
         [HttpPost("Register")]
         public async Task<IActionResult> Register(UserRegisterRequest request)
         {
-            
+            if (!IsPasswordValid(request.Password))
+            {
+                return BadRequest("Password must be at least 8 characters long and contain at least one uppercase letter, one special character, and one digit.");
+            }
             if (_context.Users.Any(u => u.Email == request.Email))
             {
                 return BadRequest("Ten email jest już wykorzystany");
@@ -36,7 +48,8 @@ namespace Projekt_Sklep.Controllers
                 Email = request.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordsalt,
-                VerificationToken = CreateRandomToken()
+                VerificationToken = CreateRandomToken(),
+                Role = UserRole.User,
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -44,6 +57,48 @@ namespace Projekt_Sklep.Controllers
             await SendVerificationEmail(user.Email, user.VerificationToken);
 
             return Ok("Rejestracja konta powiodła się");
+        }
+        private bool IsPasswordValid(string password)
+        {
+
+            var passwordRegex = new Regex(@"^(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$");
+            return passwordRegex.IsMatch(password);
+        }
+        private string CreateToken(User user)
+        {
+
+            var userFromDatabase = _context.Users.FirstOrDefault(u => u.UserId == user.UserId);
+            if (userFromDatabase == null)
+            {
+
+                throw new InvalidOperationException("User not found in the database.");
+            }
+
+
+            UserRole userRole = userFromDatabase.Role;
+
+            List<Claim> claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.Name),
+            new Claim(ClaimTypes.Role, user.Role.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
+        };
+
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings:Token").Value!));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                    claims: claims,
+                    expires: DateTime.Now.AddDays(12),
+                    signingCredentials: creds
+                );
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
         }
 
         [HttpPost("Login")]
@@ -62,7 +117,10 @@ namespace Projekt_Sklep.Controllers
             {
                 return BadRequest("Użytkownik nie zweryfikowany.");
             }
-            return Ok($"Witaj z powrotem, {user.Name} {user.Surname}! :)");
+
+            string token = CreateToken(user);
+            
+            return Ok(token);
         }
 
         private static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)

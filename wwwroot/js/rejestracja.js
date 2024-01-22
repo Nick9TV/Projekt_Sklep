@@ -1,35 +1,84 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
-    const registrationForm = document.getElementById('registrationForm');
+﻿document.getElementById('registerForm').addEventListener('submit', function (event) {
+    event.preventDefault();
 
-    registrationForm.addEventListener('submit', function (event) {
-        event.preventDefault();
+    const formData = new FormData(event.target);
+    function isPasswordValid(password) {
 
-        const formData = new FormData(registrationForm);
-        const userData = {
-            Name: formData.get('Name'),
-            Surname: formData.get('Surname'),
-            Phone: formData.get('Phone'),
-            Email: formData.get('Email'),
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/;
+        return passwordRegex.test(password);
+    }
+    if (formData.get('password') !== formData.get('confirmPassword')) {
+
+        const successMessage = document.createElement('div');
+        successMessage.innerHTML = 'Passwords do not match!';
+        successMessage.style.color = 'white';
+        successMessage.style.fontSize = '14px';
+        successMessage.style.fontFamily = 'Montserrat';
+
+        setTimeout(() => {
+            successMessage.style.display = 'none';
+        }, 4000);
+
+        return;
+    }
+    if (!isPasswordValid(formData.get('password'))) {
+
+        const successMessage = document.createElement('div');
+        successMessage.innerHTML = 'Password must be at least 8 characters long and contain at least one uppercase letter, one special character, and one digit!';
+        successMessage.style.color = 'white';
+        successMessage.style.fontSize = '14px';
+        successMessage.style.fontFamily = 'Montserrat';
+
+
+        setTimeout(() => {
+            successMessage.style.display = 'none';
+        }, 4000);
+
+        return;
+    }
+
+    fetch('../api/User/Register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: formData.get('Name'),
+            surname: formData.get('Surname'),
+            phone: formData.get('Phone'),
+            email: formData.get('Email'),
             password: formData.get('password'),
-            passwordHash: formData.get('passwordHash'),
-            // Dodaj pozostałe pola zgodnie z Twoim formularzem i modelem użytkownika
-        };
+            confirmPassword: formData.get('confirmPassword'),
+        }),
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(errorData => {
+                    const errorMessage = document.createElement('div');
 
-        fetch('https://localhost:7157/api/User/Register', { // Zmień URL na odpowiedni endpoint
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userData),
+                    setTimeout(() => {
+                        errorMessage.style.display = 'none';
+                    }, 4000);
+
+                    throw new Error(`HTTP error! Status: ${response.status}, Error: ${errorData}`);
+                });
+            }
+            return response.text();
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                // Obsługa pozytywnej odpowiedzi, np. przekierowanie lub wyświetlenie komunikatu
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                // Obsługa błędów, np. wyświetlenie komunikatu o błędzie
-            });
-    });
+        .then(data => {
+            console.log('Registration successful:', data);
+
+            const successMessage = document.createElement('div');
+
+
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+                window.location.href = 'logowanie.html';
+            }, 4000);
+        })
+        .catch(error => {
+            console.error('Registration failed:', error.message);
+        });
 });
+
+

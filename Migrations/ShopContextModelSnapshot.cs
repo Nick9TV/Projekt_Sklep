@@ -34,15 +34,9 @@ namespace Projekt_Sklep.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CartId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Model")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
 
                     b.Property<float>("Price")
                         .HasColumnType("real");
@@ -55,27 +49,7 @@ namespace Projekt_Sklep.Migrations
 
                     b.HasKey("CarId");
 
-                    b.HasIndex("CartId");
-
-                    b.HasIndex("OrderId");
-
                     b.ToTable("Cars");
-                });
-
-            modelBuilder.Entity("Projekt_Sklep.Models.Cart", b =>
-                {
-                    b.Property<int>("CartId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartId"));
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CartId");
-
-                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("Projekt_Sklep.Models.Order", b =>
@@ -86,15 +60,66 @@ namespace Projekt_Sklep.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("OrderId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Projekt_Sklep.Models.OrderCar", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CarId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderCar");
                 });
 
             modelBuilder.Entity("Projekt_Sklep.Models.User", b =>
@@ -104,11 +129,6 @@ namespace Projekt_Sklep.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -136,6 +156,9 @@ namespace Projekt_Sklep.Migrations
                     b.Property<DateTime?>("ResetTokenExpires")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
                     b.Property<string>("Surname")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -149,41 +172,41 @@ namespace Projekt_Sklep.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("Projekt_Sklep.Models.Admin", b =>
-                {
-                    b.HasBaseType("Projekt_Sklep.Models.User");
-
-                    b.Property<int>("WorkerNumber")
-                        .HasColumnType("int");
-
-                    b.HasDiscriminator().HasValue("Admin");
-                });
-
-            modelBuilder.Entity("Projekt_Sklep.Models.Car", b =>
-                {
-                    b.HasOne("Projekt_Sklep.Models.Cart", null)
-                        .WithMany("Cars")
-                        .HasForeignKey("CartId");
-
-                    b.HasOne("Projekt_Sklep.Models.Order", null)
-                        .WithMany("Cars")
-                        .HasForeignKey("OrderId");
-                });
-
-            modelBuilder.Entity("Projekt_Sklep.Models.Cart", b =>
-                {
-                    b.Navigation("Cars");
                 });
 
             modelBuilder.Entity("Projekt_Sklep.Models.Order", b =>
                 {
-                    b.Navigation("Cars");
+                    b.HasOne("Projekt_Sklep.Models.User", "user")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("user");
+                });
+
+            modelBuilder.Entity("Projekt_Sklep.Models.OrderCar", b =>
+                {
+                    b.HasOne("Projekt_Sklep.Models.Car", "Car")
+                        .WithMany()
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Projekt_Sklep.Models.Order", "Order")
+                        .WithMany("OrderCars")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Car");
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Projekt_Sklep.Models.Order", b =>
+                {
+                    b.Navigation("OrderCars");
                 });
 #pragma warning restore 612, 618
         }
