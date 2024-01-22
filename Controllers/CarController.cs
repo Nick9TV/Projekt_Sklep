@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Projekt_Sklep.Services.CarService;
@@ -17,11 +18,13 @@ namespace Projekt_Sklep.Controllers
         }
 
         [HttpGet("GetAllCars")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<Car>>> GetAllCars()
         {
             return await _carService.GetAllCars();
         }
         [HttpGet("GetSingleCar/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Car>> GetSingleCar(int id)
         {
             var result = await _carService.GetSingleCar(id);
@@ -30,12 +33,14 @@ namespace Projekt_Sklep.Controllers
             return Ok(result);
         }
         [HttpPost("AddCar")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<Car>>> AddCar(Car Car)
         {
             var result = await _carService.AddCar(Car);
             return Ok(result);
         }
         [HttpPut("UpdateCar/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<Car>>> UpdateCar(int id, Car request)
         {
             var result = await _carService.UpdateCar(id, request);
@@ -45,6 +50,7 @@ namespace Projekt_Sklep.Controllers
 
         }
         [HttpDelete("DeleteCar/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<Car>>> DeleteCar(int id)
         {
             var result = await _carService.DeleteCar(id);

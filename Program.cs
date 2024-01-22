@@ -47,6 +47,8 @@ builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddDbContext<ShopContext>();
 
+builder.Services.AddSingleton<Cart>();
+
 
 var app = builder.Build();
 

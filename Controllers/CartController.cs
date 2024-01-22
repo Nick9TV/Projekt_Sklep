@@ -6,19 +6,21 @@ namespace Projekt_Sklep.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ShoppingCartController : ControllerBase
+    public class CartController : ControllerBase
     {
         private readonly ShopContext _context;
+        private readonly Cart _cart;
 
-        public ShoppingCartController(ShopContext context)
+        public CartController(ShopContext context, Cart cart)
         {
             _context = context;
+            _cart = cart;
         }
 
-        [HttpGet("Cart")]
+        [HttpGet("GetCart")]
         public ActionResult<Cart> GetCart()
         {
-            return Ok(_context);
+            return Ok(_cart);
         }
 
         [HttpPost("AddToCart/{CarId}")]
