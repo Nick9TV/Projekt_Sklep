@@ -16,12 +16,12 @@ namespace Projekt_Sklep.Controllers
             _carService = CarService;
         }
 
-        [HttpGet]
+        [HttpGet("GetAllCars")]
         public async Task<ActionResult<List<Car>>> GetAllCars()
         {
             return await _carService.GetAllCars();
         }
-        [HttpGet("{id}")]
+        [HttpGet("GetSingleCar/{id}")]
         public async Task<ActionResult<Car>> GetSingleCar(int id)
         {
             var result = await _carService.GetSingleCar(id);
@@ -29,13 +29,13 @@ namespace Projekt_Sklep.Controllers
                 return NotFound("Nie ma samochodu o takim ID");
             return Ok(result);
         }
-        [HttpPost]
+        [HttpPost("AddCar")]
         public async Task<ActionResult<List<Car>>> AddCar(Car Car)
         {
             var result = await _carService.AddCar(Car);
             return Ok(result);
         }
-        [HttpPut("{id}")]
+        [HttpPut("UpdateCar/{id}")]
         public async Task<ActionResult<List<Car>>> UpdateCar(int id, Car request)
         {
             var result = await _carService.UpdateCar(id, request);
@@ -44,7 +44,7 @@ namespace Projekt_Sklep.Controllers
             return Ok(result);
 
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteCar/{id}")]
         public async Task<ActionResult<List<Car>>> DeleteCar(int id)
         {
             var result = await _carService.DeleteCar(id);

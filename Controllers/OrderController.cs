@@ -16,7 +16,7 @@ namespace Projekt_Sklep.Controllers
             _Cart = cart;
         }
 
-        [HttpPost("place")]
+        [HttpPost("PlaceOrder")]
         public async Task<IActionResult> PlaceOrder()
         {
 
@@ -27,7 +27,7 @@ namespace Projekt_Sklep.Controllers
 
             if (currentUser == null)
             {
-                return Unauthorized("Invalid user");
+                return Unauthorized("Nieprawidłowy użytkownik.");
             }
 
             // Pobierz zawartość koszyka z sesji
@@ -35,7 +35,7 @@ namespace Projekt_Sklep.Controllers
 
             if (cartProducts == null || cartProducts.Count == 0)
             {
-                return BadRequest("Empty shopping cart. Add products to the cart before placing an order.");
+                return BadRequest("Pusty koszyk. Dodaj produkty zanim złożysz zamówienie.");
             }
 
             // Stwórz nowe zamówienie
@@ -63,11 +63,11 @@ namespace Projekt_Sklep.Controllers
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-            return Ok($"Order successfully placed with ID: {order.OrderId}");
+            return Ok($"Zamówienie zostało złożone o numerze: {order.OrderId}.");
         }
 
 
-        [HttpGet("userorder/{userId}")]
+        [HttpGet("GetUserOrdersById/{userId}")]
         public IActionResult GetUserOrdersById(int userId)
         {
             var userOrders = _context.Orders

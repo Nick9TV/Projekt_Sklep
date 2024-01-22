@@ -160,7 +160,7 @@ namespace Projekt_Sklep.Controllers
                 MailMessage mailMessage = new MailMessage
                 {
                     From = new MailAddress("mikihoffmann00@gmail.com"),
-                    Subject = "Account Verification",
+                    Subject = "Weryfikacja konta.",
                     Body = $"Kliknij poniższy link aby zweryfikować konto: " +
                            $"https://localhost:7157/api/User/verify?token={token}"
                 };
@@ -207,28 +207,28 @@ namespace Projekt_Sklep.Controllers
 
             return Ok("Hasło zienione.");
         }
-        //private async Task SendPasswordResetEmail(string userEmail, string token)
-        //{
-        //    using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com"))
-        //    {
-        //        smtpClient.UseDefaultCredentials = false;
-        //        smtpClient.Credentials = new NetworkCredential("mikihoffmann00@gmail.com", "skgy krow imbu ciel");
-        //        smtpClient.EnableSsl = true;
-        //        smtpClient.Port = 587;
+        private async Task SendPasswordResetEmail(string userEmail, string token)
+        {
+            using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com"))
+            {
+                smtpClient.UseDefaultCredentials = false;
+                smtpClient.Credentials = new NetworkCredential("mikihoffmann00@gmail.com", "skgy krow imbu ciel");
+                smtpClient.EnableSsl = true;
+                smtpClient.Port = 587;
 
-        //        MailMessage mailMessage = new MailMessage
-        //        {
-        //            From = new MailAddress("mikihoffmann00@gmail.com"),
-        //            Subject = "Password Reset",
-        //            Body = $"Hello,\n\nYou have requested to reset your password. Please click the following link to reset your password: " +
-        //                   $"https://localhost:7157/api/user/reset-password?token={token}\n\nBest regards,\nYour App"
-        //        };
+                MailMessage mailMessage = new MailMessage
+                {
+                    From = new MailAddress("mikihoffmann00@gmail.com"),
+                    Subject = "Reset Hasła.",
+                    Body = $"Jeżeli chcesz zresetować hasło kliknij w link. " +
+                           $"https://localhost:7157/api/user/reset-password?token={token}."
+                };
 
-        //        mailMessage.To.Add(userEmail);
+                mailMessage.To.Add(userEmail);
 
-        //        await smtpClient.SendMailAsync(mailMessage);
-        //    }
-        //}
+                await smtpClient.SendMailAsync(mailMessage);
+            }
+        }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt) 
         {

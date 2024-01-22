@@ -28,7 +28,7 @@ namespace Projekt_Sklep.Controllers
 
             if (Car == null)
             {
-                return NotFound("Product not found.");
+                return NotFound("Nie znaleziono produktu o podanym id.");
             }
 
             // Check if the product is already in the cart
@@ -45,7 +45,7 @@ namespace Projekt_Sklep.Controllers
             }
 
 
-            return Ok("Product has been successfully added to cart.");
+            return Ok("Produkt dodany do koszyka.");
         }
 
         [HttpPut("EditCart/{CarId}/{newQuantity}")]
@@ -65,19 +65,19 @@ namespace Projekt_Sklep.Controllers
             return Ok("Ilość produktu w koszyku została pomyślnie zaktualizowana."+productToUpdate);
         }
 
-        [HttpDelete("RemoveFromCart /{CarId}")]
+        [HttpDelete("RemoveFromCart/{CarId}")]
         public ActionResult<Cart> RemoveFromCart(int CarId)
         {
             var productToRemove = _context.Cars.FirstOrDefault(p => p.CarId == CarId);
 
             if (productToRemove == null)
             {
-                return NotFound("Product not found in the cart.");
+                return NotFound("Nie znaleziono produktu o podanym id w koszyku.");
             }
 
             _context.Cars.Remove(productToRemove);
 
-            return Ok("Product has been successfully deleted from the cart.");
+            return Ok("Produkt został usunięty z koszyka.");
         }
     }
 }

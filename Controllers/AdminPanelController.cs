@@ -19,13 +19,13 @@ namespace Projekt_Sklep.Controllers
             _userService = UserService;
         }
 
-        [HttpGet]
+        [HttpGet("GetAllUsers")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<User>>> GetAllUsers()
         {
             return await _userService.GetAllUsers();
         }
-        [HttpGet("{id}")]
+        [HttpGet("GetSingleUser/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<User>> GetSingleUser(int id)
         {
@@ -34,14 +34,14 @@ namespace Projekt_Sklep.Controllers
                 return NotFound("Nie ma użytkownika o takim ID");
             return Ok(result);
         }
-        [HttpPost]
+        [HttpPost("AddUser")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<User>>> AddUser(User User)
         {
             var result = await _userService.AddUser(User);
             return Ok(result);
         }
-        [HttpPut("{id}")]
+        [HttpPut("UpdateUser/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<User>>> UpdateUser(int id, User request)
         {
@@ -50,7 +50,7 @@ namespace Projekt_Sklep.Controllers
                 return NotFound("Nie ma użytkownika o takim ID");
             return Ok(result);
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteUser/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<User>>> DeleteUser(int id)
         {
